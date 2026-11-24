@@ -2,45 +2,86 @@
 <html lang="hy">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SMOKE X</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#101010;color:white;font-family:Arial}
-header{text-align:center;padding:25px;background:#191919;border-bottom:2px solid #e32636}
-header h1{color:#e32636;letter-spacing:5px;font-size:36px}
-main{max-width:1100px;margin:auto;padding:20px}
-h2{text-align:center}
-#products{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px}
-.card{background:#202020;border-radius:14px;padding:14px}
-.card img{width:100%;height:180px;object-fit:cover;border-radius:10px}
+header{background:#191919;text-align:center;padding:22px;border-bottom:2px solid #e32636}
+h1{color:#e32636;letter-spacing:5px}
+main{max-width:1000px;margin:auto;padding:20px}
+button{background:#e32636;color:white;border:0;padding:12px 18px;border-radius:8px;margin:5px;cursor:pointer}
+input,textarea{width:100%;padding:12px;margin:7px 0;background:#222;color:white;border:1px solid #555;border-radius:7px}
+#products{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
+.card{background:#202020;padding:12px;border-radius:12px}
+.card img{width:100%;height:170px;object-fit:cover;border-radius:8px}
 .price{color:#ff394b;font-size:22px;font-weight:bold}
-button{background:#e32636;color:white;border:0;padding:12px;border-radius:8px}
-footer{text-align:center;padding:25px;color:#888}
+#admin{display:none;background:#202020;padding:18px;border-radius:12px;margin-top:25px}
 </style>
 </head>
 <body>
 <header>
 <h1>SMOKE X</h1>
-<p>Բարի գալուստ մեր կայք</p>
+<p>Ապրանքների կատալոգ</p>
 </header>
 <main>
 <h2>Մեր ապրանքները</h2>
-<div id="products">
-<div class="card">
-<img src="https://placehold.co/400x300?text=Product+1">
-<h3>Ապրանք 1</h3>
-<p>Ապրանքի նկարագրություն</p>
-<div class="price">5 000 ֏</div>
-</div>
-<div class="card">
-<img src="https://placehold.co/400x300?text=Product+2">
-<h3>Ապրանք 2</h3>
-<p>Ապրանքի նկարագրություն</p>
-<div class="price">7 000 ֏</div>
-</div>
+<div id="products"></div>
+<button onclick="login()">Ադմինի մուտք</button>
+<div id="admin">
+<h2>Ավելացնել ապրանք</h2>
+<input id="name" placeholder="Ապրանքի անուն">
+<input id="price" type="number" placeholder="Գին (֏)">
+<input id="photo" type="file" accept="image/*">
+<textarea id="description" placeholder="Նկարագրություն"></textarea>
+<button onclick="addProduct()">Ավելացնել</button>
+<button onclick="logout()">Դուրս գալ</button>
 </div>
 </main>
-<footer>SMOKE X © 2026</footer>
+<script>
+let products=JSON.parse(localStorage.getItem("products")||"[]");
+function render(){
+document.getElementById("products").innerHTML="";
+products.forEach((p,i)=>{
+let d=document.createElement("div");
+d.className="card";
+let img=document.createElement("img");
+img.src=p.photo;
+let h=document.createElement("h3");
+h.textContent=p.name;
+let desc=document.createElement("p");
+desc.textContent=p.description;
+let price=document.createElement("div");
+price.className="price";
+price.textContent=p.price+" ֏";
+d.append(img,h,desc,price);
+document.getElementById("products").append(d);
+});
+}
+function login(){
+let pass=prompt("Գրիր ադմինի գաղտնաբառը");
+if(pass==="12345")document.getElementById("admin").style.display="block";
+else alert("Սխալ գաղտնաբառ");
+}
+function logout(){
+document.getElementById("admin").style.display="none";
+}
+function addProduct(){
+let file=document.getElementById("photo").files[0];
+let name=document.getElementById("name").value;
+let price=document.getElementById("price").value;
+let description=document.getElementById("description").value;
+if(!name||!price||!file)return alert("Լրացրու բոլոր դաշտերը");
+let reader=new FileReader();
+reader.onload=function(){
+products.push({name,price,description,photo:reader.result});
+localStorage.setItem("products",JSON.stringify(products));
+render();
+alert("Ապրանքը ավելացվեց");
+};
+reader.readAsDataURL(file);
+}
+render();
+</script>
 </body>
 </html>
